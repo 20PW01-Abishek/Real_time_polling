@@ -1,0 +1,19 @@
+{
+  "name": "polling-app",
+  "version": "1.0.0",
+  "description": "polling app",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "20pw01 20pw34",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "socket.io": "^4.5.1",
+    "useragent": "^2.3.0"
+  }
+}

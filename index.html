@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Real Time Polling App</title>
+</head>
+
+<style>
+    button {
+        width: 18%;
+        justify-content: space-between;
+        border: none;
+        border-radius: 30px;
+        height: 50px;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: bold;
+        transition: 1s;
+        background-image: linear-gradient(rgb(0, 0, 61), rgb(0, 83, 128));
+        margin: auto;
+    }
+
+    button:disabled {
+        width: 19%;
+        background-color: gray;
+        background-image: none;
+        color: black;
+    }
+
+    button:disabled:hover {
+        width: 19%;
+        background-color: gray;
+        background-image: none;
+        color: black;
+        animation: shake 0.5s;
+        animation-iteration-count: infinite;
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+    button:hover {
+        width: 23%;
+        background-image: linear-gradient(rgb(0, 83, 128),rgb(0, 0, 61));
+    }
+</style>
+
+<body>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js"
+        integrity="sha512-gVG6WRMUYFaIdoocaxbqd02p3DUbhReTBWc7NTGB96i7vONrr7GuCZJHFFmkXEhpwilIWUnfRIMSlKaApwd/jg=="
+        crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"
+        integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
+        crossorigin="anonymous"></script>
+
+    <h1 style="text-align: center; color: rgb(70, 0, 136);">Which is the best programming language of these?</h1>
+
+    <!-- The canvas -->
+    <canvas id="voteChart" style="height:50vh; width:100vw; display:none;"></canvas>
+
+    <!-- The buttons -->
+    <button class="myBtn" onclick="vote(0)">JavaScript</button>
+    <button class="myBtn" onclick="vote(1)">C#</button>
+    <button class="myBtn" onclick="vote(2)">PHP</button>
+    <button class="myBtn" onclick="vote(3)">Python</button>
+    <button class="myBtn" onclick="vote(4)">Go</button>
+
+    <script>
+
+        if(document.cookie=="flag=1")
+        {
+            const candidateList = document.querySelectorAll(".myBtn");
+            for (let i = 0; i < candidateList.length; i++) {
+                candidateList[i].disabled = true;
+            }
+
+            let canvas = document.getElementById("voteChart");
+            canvas.style.display = "block";
+        }        
+
+        // Initialize the canvas
+        const ctx = document.getElementById("voteChart").getContext("2d");
+
+        // Initializing the chart
+        const chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Candidates"],
+            },
+            options: {
+
+            }
+        });
+
+        // Connect to server
+        const socket = io("localhost:80");
+        
+        // On new vote update the chart
+        socket.on("update", (candidates) => {
+
+            // Convert the candidates object into an array
+            candidates = Object.entries(candidates);
+            
+            // For each candidate
+            for (const [key, candidate] of candidates) {
+
+                // Update the vote if the candidate already exists if not create a new candidate and then update the vote
+                if (typeof chart.data.datasets[key] == "undefined" && chart.data.datasets.length < candidates.length) {
+                    chart.data.datasets.push({
+                        backgroundColor: candidate.color,
+                        borderColor: candidate.color,
+                        data: [candidate.votes],
+                        label: candidate.label,
+                        options: {
+                            scales: {
+                                y: {
+                                    min:0,
+                                    beginAtZero : true,
+                                }
+                            }
+                        }
+                    });
+                } else if (typeof chart.data.datasets[key] != "undefined") {
+                    chart.data.datasets[key].data = [candidate.votes];
+                }
+
+            }
+
+            // Update the chart
+            chart.update();
+        });
+   
+
+        // Make a new vote (Remember this is not a safe way to do this)
+        function vote(index) {
+            socket.emit("vote", index);
+
+            // Block the client from casting multiple votes
+            const candidateList = document.querySelectorAll(".myBtn");
+            for (let i = 0; i < candidateList.length; i++) {
+                candidateList[i].disabled = true;
+            }
+
+            // Enable live display of results of the poll
+            let canvas = document.getElementById("voteChart");
+            canvas.style.display = "block";
+        }
+        document.cookie="flag=1; expires=Sun, 19 Jun 2022 00:00:00 UTC; path=/;";
+               
+    </script>
+</body>
+
+</html>
