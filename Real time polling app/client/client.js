@@ -1,5 +1,3 @@
-var flag = true;
-
 if(document.cookie=="flag=1")
 {
     const l = document.querySelectorAll(".myBtn");
