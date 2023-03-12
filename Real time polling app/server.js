@@ -21,7 +21,6 @@ io.on("connection", (socket) => {
         if (candidates[index]) {
             candidates[index].votes += 1;
         }
-        console.log(candidates);
         io.emit("update", candidates);
     });
 
