@@ -1,4 +1,4 @@
-var flag = false;
+var flag = true;
 
 if(document.cookie=="flag=1")
 {
