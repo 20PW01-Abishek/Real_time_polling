@@ -1,10 +1,10 @@
 if(document.cookie=="flag=1")
 {
-    const l = document.querySelectorAll(".myBtn");
-    for (let i = 0; i < l.length; i++) {
-        l[i].disabled = true;
+    const candidateList = document.querySelectorAll(".myBtn");
+    for (const candidate of candidateList) {
+        candidate.disabled = true;
     }
-
+    
     let canvas = document.getElementById("voteChart");
     canvas.style.display = "block";
 }        
@@ -57,9 +57,9 @@ socket.on("update", (candidates) => {
 function vote(index) {
     socket.emit("vote", index);
 
-    const l = document.querySelectorAll(".myBtn");
-    for (let i = 0; i < l.length; i++) {
-        l[i].disabled = true;
+    const candidateList = document.querySelectorAll(".myBtn");
+    for (let i = 0; i < candidateList.length; i++) {
+        candidateList[i].disabled = true;
     }
 
     let canvas = document.getElementById("voteChart");
